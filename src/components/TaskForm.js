@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import * as actions from './../actions/index'
 
 
 function TaskForm(props) {
@@ -6,12 +8,12 @@ function TaskForm(props) {
     const [status , setStatus] = useState(false);
     const [id , setId] = useState('');
 
-    const {onCloseForm, task } = props;
+    const {onCloseForm, itemEditing, isDisplayForm, onSaveTask} = props;
 
     const onSubmit = (e) => {
         e.preventDefault();
         if(name) {
-            props.onSubmit({name , status, id})
+            onSaveTask({name, status , id});
             onClear();
             onCloseForm();
         }
@@ -23,19 +25,19 @@ function TaskForm(props) {
     }
 
     useEffect(() => {
-        console.log(task)
-        if(task) {
-            setId(task.id);
-            setName(task.name);
-            setStatus(task.status);
+        if(itemEditing) {
+            setId(itemEditing.id);
+            setName(itemEditing.name);
+            setStatus(itemEditing.status);
         } else {
             setId('');
             setName('');
             setStatus(false);
         }
-        
-    }, [props.task]);
-
+    }, [itemEditing]);
+    
+    
+    if(!isDisplayForm) return null
     return (
         <div className="panel panel-warning">
             <div className="panel-heading">
@@ -78,4 +80,21 @@ function TaskForm(props) {
     );
 }
 
-export default TaskForm;
+const mapStateToProps =(state) => {
+    return {
+        isDisplayForm : state.isDisplayForm,
+        itemEditing: state.itemEditing
+    }
+}
+
+const mapDispatchToProps = (dispatch , props) => {
+    return {
+        onSaveTask : (task)=> {
+            dispatch(actions.saveTask(task));
+        },
+        onCloseForm: () => {
+            dispatch(actions.closeForm())
+        }
+    }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(TaskForm);

@@ -1,24 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import TaskItem from './TaskItem'
+import { connect } from 'react-redux';
+import * as actions from './../actions/index'
 
 
 function TaskList(props) {
     const [filterName , setFilterName]= useState('');
     const [filterStatus, setFilterStatus] = useState(-1);
-    const {tasks, onUpdateStatus, onDelete, onUpdate, onFilter}= props
+
+    var {tasks , onFilterTable , filterTable , keyword ,sort}= props
    
     useEffect(() => {
-        onFilter(filterName.toLowerCase(), filterStatus)
+        onFilterTable({name: filterName.toLowerCase(),status: filterStatus})
     }, [filterName]);
 
     useEffect(() => {
-        onFilter(filterName, filterStatus)
+        onFilterTable({name: filterName, status: filterStatus})
     }, [filterStatus]);
 
-    // useEffect(() => {
-    //    filter.name=''
-    // //    filter.status=-1;
-    // });
+
+    if(filterTable.name) {
+        tasks = tasks.filter((task) => {
+            return task.name.toLowerCase().indexOf(filterTable.name.toLowerCase()) !== -1
+        });
+    }
+
+    tasks = tasks.filter((task) => {
+        if(filterTable.status === -1) {
+            return task;
+        }else {
+            return task.status===(filterTable.status ===1? true: false);
+        }
+    });
+
+    if(keyword !== '') {
+        tasks = tasks.filter((task) => {
+            return task.name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+        });
+    }
+
+    // sort
+    if(sort.by ==='name') {
+        tasks.sort((a,b) => {
+            if(a.name > b.name) return sort.value;
+            else if ( a.name < b.name) return -sort.value;
+            else return 0;
+        });
+    }else {
+        tasks.sort((a,b) => {
+            if(a.status > b.status) return -sort.value;
+            else if ( a.status < b.status) return sort.value;
+            else return 0;
+        });
+    }
 
     return (
         <table className="table table-bordered table-hover">
@@ -61,9 +95,6 @@ function TaskList(props) {
                         key={index} 
                         index={index} 
                         task = {task}
-                        onUpdateStatus={onUpdateStatus}
-                        onDelete={onDelete}
-                        onUpdate={onUpdate}
                     />
                 ): 'Loading...'}
             </tbody>
@@ -71,4 +102,20 @@ function TaskList(props) {
     );
 }
 
-export default TaskList;
+const mapStateToProps = (state) => {
+    return {
+        tasks: state.tasks,
+        filterTable : state.filterTable,
+        keyword: state.search,
+        sort: state.sort
+    }
+}
+const mapDispatchToProps =(dispatch , props) => {
+    return {
+        onFilterTable : (filter) => {
+            dispatch(actions.filterTask(filter))
+        }
+  
+    }
+  }
+export default connect(mapStateToProps, mapDispatchToProps)(TaskList);

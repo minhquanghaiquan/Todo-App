@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import * as actions from './../actions/index'
+import { connect } from 'react-redux';
 
 
 function Sort(props) {
-
-    const [sort , setSort] = useState({by: 'name', value: 1});
-    const onClick = async(sortBy, sortValue, e) => {
-        e.preventDefault();
-        setSort({by: sortBy, value: sortValue});
-        
-    }
-    useEffect(() => {
-        props.onSort(sort);
-    }, [sort]);
+    const {onSort , sort} = props;
 
     
+    const onClick = (sortBy, sortValue, e) => {
+        e.preventDefault();
+        onSort({by: sortBy, value: sortValue});
+    }
+
+
   return (
     <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <div className="dropdown">
@@ -52,4 +51,18 @@ function Sort(props) {
   );
 }
 
-export default Sort;
+const mapStateToProps = (state) => {
+    return { 
+        sort: state.sort
+    }
+  }
+  
+  const mapDispatchToProps =(dispatch , props) => {
+    return {
+        onSort: (sort) => {
+            dispatch(actions.sortTask(sort))
+      },
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Sort);

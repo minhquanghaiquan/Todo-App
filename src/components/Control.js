@@ -5,8 +5,8 @@ import Sort from './Sort'
 function Control(props) {
   return (
     <div className="row mt-2">
-        <Search onSearch= {props.onSearch} />
-        <Sort onSort={props.onSort}/>
+        <Search />
+        <Sort/>
     </div>
   );
 }

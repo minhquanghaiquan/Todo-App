@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import * as actions from './../actions/index'
+
 
 
 function Search(props) {
+  const {onSearch} = props;
   const [keyword , setKeyword] = useState('');
 
 
@@ -9,9 +13,7 @@ function Search(props) {
     setKeyword(e.target.value);
   }
 
-  const onSearch = () => {
-    props.onSearch(keyword)
-  }
+ 
 
   return (
     <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -27,7 +29,7 @@ function Search(props) {
                 <button 
                   className="btn btn-primary" 
                   type="button"
-                  onClick=  {onSearch}
+                  onClick=  {() => onSearch(keyword)}
                 >
                     <span className="fa fa-search mr-2"></span>Tìm
                 </button>
@@ -37,4 +39,18 @@ function Search(props) {
   );
 }
 
-export default Search;
+const mapStateToProps = (state) => {
+  return { 
+
+  }
+}
+
+const mapDispatchToProps =(dispatch , props) => {
+  return {
+    onSearch: (keyword) => {
+        dispatch(actions.searchTask(keyword))
+    },
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Search);
